@@ -1,6 +1,6 @@
 class ResNetBlock2L(nn.Module):
   
-  def __init__(self, ic_conv1, oc_conv1, downsample):
+  def __init__(self, ic_conv1, oc_conv1, downsample, stride=2):
     '''
     '''
     
@@ -9,24 +9,25 @@ class ResNetBlock2L(nn.Module):
     assert(downsample == True or downsample == False)
     self.downsample = downsample
     
-    stride = 1
     if self.downsample:
-        stride = 2
+      stride = stride
+    else:
+      stride = 1
     
     self.conv1 = BNConv(in_channels=ic_conv1,
-                        out_channes=oc_conv1,
+                        out_channels=oc_conv1,
                         kernel_size=3,
                         padding=1,
                         stride=stride)
     
     self.conv2 = BNConv(in_channels=oc_conv1,
-                        out_channels=oc_conv1,
+                        out_channels=oc_conv1*4,
                         kernel_size=3,
                         padding=1,
                         stride=1)
 
     self.convs = BNConv(in_channels=ic_conv1,
-                        out_channels=oc_conv1
+                        out_channels=oc_conv1*4,
                         kernel_size=3,
                         padding=1,
                         stride=stride)
@@ -38,8 +39,7 @@ class ResNetBlock2L(nn.Module):
     '''
     
     xm = self.relu(self.conv1(x))
-    xm = self.relu(self.conv2(xm))
-    xm = self.conv3(xm)
+    xm = self.conv2(xm)
     
     xs = self.convs(x) if self.downsample else x
     
