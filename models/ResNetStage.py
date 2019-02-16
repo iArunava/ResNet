@@ -1,24 +1,26 @@
 class ResNetBlock(nn.Module):
   
-  def __init__(self, block, ic_conv1, oc_conv1, num_layers, downsample):
+  def __init__(self, block, ic_conv1, oc_conv1, num_layers, stride=2):
     '''
     '''
     super(ResNetBlock,self).__init__()
     
     self.layers = []
     
-    if downsample:
-        layers.append(block(ic_conv1=ic_conv1,
-                            oc_conv1=oc_conv1,
-                            downsample=True))
-        num_layers -= 1
-        
+    
+    self.layers.append(block(ic_conv1=ic_conv1,
+                        oc_conv1=oc_conv1,
+                        downsample=True,
+                        stride=stride))
+    
+    num_layers -= 1
+    #ic_conv1 = ic_conv1*4
     for _ in range(num_layers):
-      layers.append(block(ic_conv1=ic_conv1,
-                          oc_conv2=oc_conv2,
+      self.layers.append(block(ic_conv1=oc_conv1*4,
+                          oc_conv1=oc_conv1,
                           downsample=False))
     
-    self.stage = nn.Sequential(*layers)
+    self.stage = nn.Sequential(*self.layers)
     
   def forward(self, x):
     '''
