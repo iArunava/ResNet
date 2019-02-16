@@ -1,3 +1,7 @@
+from .ResNetBlock2L import ResNetBlock2L
+from .ResNetBlock3L import ResNetBlock3L
+from .ResNetBlock import ResNetStage
+
 class ResNet(nn.Module):
   
   def __init__(self, nc, block, layers, s1_channels=64):
