@@ -14,6 +14,7 @@ class BNConv(nn.Module):
             self.main = nn.Sequential(
                         nn.Conv2d(in_channels=in_channels,
                                               out_channels=out_channels,
+                                              kernel_size=kernel_size,
                                               stride=stride,
                                               padding=padding,
                                               bias=bias),
@@ -26,10 +27,11 @@ class BNConv(nn.Module):
 
                             nn.Conv2d(in_channels=in_channels,
                                       out_channels=out_channels,
+                                      kernel_size=kernel_size,
                                       stride=stride,
                                       padding=padding,
                                       bias=bias)
-                        )
+                    )
 
 
     def forward(self, x):
