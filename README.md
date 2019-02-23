@@ -26,3 +26,13 @@ The Repository contains the code to create all 5 ResNet architectures:
 >>> To get the ResNet152 use
 >>> ResNet(nc, ResNetBlock3L, [3, 8, 36, 3])
 ```
+
+## References
+
+1. Deep Residual Learning for Image Recognition He et al. [Paper](https://arxiv.org/pdf/1512.03385.pdf)
+2. Identity Mappings in Deep Residual Networks He et al. [Paper](https://arxiv.org/pdf/1603.05027.pdf)
+
+## License
+
+The code in this repository is free to use and modify for both commercial and non-commercial use.
+If possible, just refer back to this repository.
