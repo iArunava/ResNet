@@ -14,7 +14,7 @@ class ResNetBlock(nn.Module):
     self.rblocks = nn.ModuleList([block(ic_conv1=ic_conv1,
                                         oc_conv1=oc_conv1,
                                         downsample=True,
-                                        stride=stride))
+                                        stride=stride)])
     
     self.rblocks.extend([block(ic_conv1=oc_conv1*4,
                                 oc_conv1=oc_conv1,
