@@ -57,7 +57,7 @@ class ResidualBlock3L(nn.Module):
 
     if self.downsample:
         self.main =  BNConv(in_channels=ic_conv,
-                                out_channels=oc_conv*self.expansion,
+                                out_channels=oc_conv,
                                 kernel_size=3,
                                 padding=1,
                                 stride=stride,
