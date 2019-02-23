@@ -41,7 +41,7 @@ class ResidualBlock3L(nn.Module):
                             momentum=0.9,
                             conv_first=True),
 
-                    nn.ReLU(inplace=True)
+                    nn.ReLU(inplace=True),
                     
                     BNConv(in_channels=oc_convi,
                             out_channels=oc_conv,
