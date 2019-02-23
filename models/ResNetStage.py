@@ -6,18 +6,18 @@ from .ResNetBlock3L import ResNetBlock3L
 
 class ResNetBlock(nn.Module):
   
-  def __init__(self, block, ic_conv1, oc_conv1, num_layers, stride=2):
+  def __init__(self, block, ic_conv, oc_conv, num_layers, stride=2):
     '''
     '''
     super(ResNetBlock,self).__init__()
     
-    self.rblocks = nn.ModuleList([block(ic_conv1=ic_conv1,
-                                        oc_conv1=oc_conv1,
+    self.rblocks = nn.ModuleList([block(ic_conv=ic_conv,
+                                        oc_conv=oc_conv,
                                         downsample=True,
                                         stride=stride)])
     
-    self.rblocks.extend([block(ic_conv1=oc_conv1*4,
-                                oc_conv1=oc_conv1,
+    self.rblocks.extend([block(ic_conv=oc_conv,
+                                oc_conv=oc_conv,
                                 downsample=False) for i in range (num_layers-1)])
     
   def forward(self, x):
