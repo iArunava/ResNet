@@ -1,53 +1,85 @@
-class ResNetBlock3L(nn.Module):
-  def __init__(self, ic_conv1, oc_conv1, downsample, stride=2):
+import torch
+import torch.nn as nn
+
+from .BNConv import BNConv
+
+class ResidualBlock3L(nn.Module):
+  def __init__(self, ic_conv, oc_conv, downsample, expansion=4, stride=2,
+                     conv_first=True):
     '''
     '''
     
-    super().__init__()
+    super(ResidualBlock3L, self).__init__()
     
     assert (downsample == True or downsample == False)
     self.downsample = downsample
+    self.expansion = expansion
+    oc_convi = oc_conv // self.expansion
     
+    stride = stride if self.downsample else 1
+    
+    # TODO: update this block for handling conv_first=False
+    # Where the relu block needs to come before the BNConv Layer
+    self.side = nn.Sequential (
+                    BNConv(in_channels=ic_conv,
+                             out_channels=oc_convi,
+                             kernel_size=1,
+                             padding=0,
+                             stride=1,
+                             eps=2e-5,
+                             momentum=0.9,
+                             conv_first=True),
+
+                    nn.ReLU(inplace=True),
+                    
+                    BNConv(in_channels=oc_convi,
+                            out_channels=oc_convi,
+                            kernel_size=3,
+                            padding=1,
+                            stride=stride,
+                            eps=2e-5,
+                            momentum=0.9,
+                            conv_first=True),
+
+                    nn.ReLU(inplace=True)
+                    
+                    BNConv(in_channels=oc_convi,
+                            out_channels=oc_conv,
+                            kernel_size=1,
+                            padding=0,
+                            stride=1,
+                            eps=2e-5,
+                            momentum=0.9,
+                            conv_first=True)
+                )
+    
+    self.relu = nn.ReLU(inplace=True)
+
     if self.downsample:
-      stride = stride
-    else:
-      stride = 1
-    
-    self.conv1 = BNConv(in_channels=ic_conv1,
-                         out_channels=oc_conv1,
-                         kernel_size=1,
-                         padding=0,
-                         stride=1)
-    
-    self.conv2 = BNConv(in_channels=oc_conv1,
-                        out_channels=oc_conv1,
-                        kernel_size=3,
-                        padding=1,
-                        stride=stride)
-    
-    self.conv3 = BNConv(in_channels=oc_conv1,
-                        out_channels=oc_conv1*4,
-                        kernel_size=1,
-                        padding=0,
-                        stride=1)
-    
-    self.convs = BNConv(in_channels=ic_conv1,
-                        out_channels=oc_conv1*4,
-                        kernel_size=3,
-                        padding=1,
-                        stride=stride)
-      
-    self.relu = nn.ReLU()
+        self.main =  BNConv(in_channels=ic_conv,
+                                out_channels=oc_conv*self.expansion,
+                                kernel_size=3,
+                                padding=1,
+                                stride=stride,
+                                eps=2e-5,
+                                momentum=0.9,
+                                conv_first=True)
+
     
   def forward(self, x):
     '''
+    This method defines the forward pass for the Residual Block
+    with 3 layers.
+
+    Arguments:
+    - x : The input to the network
+
+    Returns:
+    - The output of the network
     '''
     
-    xm = self.relu(self.conv1(x))
-    xm = self.relu(self.conv2(xm))
-    xm = self.conv3(xm)
-    
-    xs = self.convs(x) if self.downsample else x
+    xs = self.side(x)
+    xm = self.main(x) if self.downsample else x
     
     x = xm + xs
     x = self.relu(x)
