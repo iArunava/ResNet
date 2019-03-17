@@ -27,6 +27,10 @@ The Repository contains the code to create all 5 ResNet architectures:
 >>> ResNet(nc, ResNetBlock3L, [3, 8, 36, 3])
 ```
 
+## Pretrained Models
+
+1. ResNet18 - CIFAR10 - 83.9% - [Download](https://drive.google.com/file/d/1JLZ5h15yF7e6QBzXrZrzEE6i98SrQylA/view?usp=sharing)
+
 ## References
 
 1. Deep Residual Learning for Image Recognition He et al. [Paper](https://arxiv.org/pdf/1512.03385.pdf)
