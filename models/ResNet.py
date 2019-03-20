@@ -32,15 +32,15 @@ class ResNet(nn.Module):
               ResNetBlock(block, ic_conv=s1_channels,
                               oc_conv=s1_channels*4,
                               num_layers=layers[0],
-                              stride=1)
+                              stride=1),
     
               ResNetBlock(block, ic_conv=s1_channels*4,
                               oc_conv=s1_channels*8,
-                              num_layers=layers[1])
+                              num_layers=layers[1]),
     
              ResNetBlock(block, ic_conv=s1_channels*8,
                               oc_conv=s1_channels*16,
-                              num_layers=layers[2])
+                              num_layers=layers[2]),
     
              ResNetBlock(block, ic_conv=s1_channels*16,
                               oc_conv=s1_channels*32,
