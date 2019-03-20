@@ -12,14 +12,17 @@ class ResidualBlock3L(nn.Module):
     super(ResidualBlock3L, self).__init__()
     
     assert (downsample == True or downsample == False)
+    assert(relu_after_add == True or relu_after_add == False)
     self.downsample = downsample
     self.expansion = expansion
+    self.relu_after_add = relu_after_add
     oc_convi = oc_conv // self.expansion
     
     stride = stride if self.downsample else 1
     
     # TODO: update this block for handling conv_first=False
     # Where the relu block needs to come before the BNConv Layer
+    
     self.side = nn.Sequential (
                     BNConv(in_channels=ic_conv,
                              out_channels=oc_convi,
@@ -82,6 +85,6 @@ class ResidualBlock3L(nn.Module):
     xm = self.main(x) if self.downsample else x
     
     x = xm + xs
-    x = self.relu(x)
+    x = self.relu(x) if self.relu_after_add else x
 
     return x

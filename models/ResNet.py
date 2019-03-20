@@ -4,7 +4,7 @@ from .ResNetBlock import ResNetStage
 
 class ResNet(nn.Module):
   
-  def __init__(self, nc, block, layers, s1_channels=64):
+  def __init__(self, nc, block, layers, s1_channels=64, apool=True):
     '''
     The class that defines the ResNet module
     
@@ -13,6 +13,8 @@ class ResNet(nn.Module):
 
     '''
     super(ResNet, self).__init__()
+    
+    self.apool = apool
     
     self.conv1 = BNConv(in_channels=3,
                         out_channels=s1_channels,
@@ -24,7 +26,7 @@ class ResNet(nn.Module):
                         conv_first=True)
     
     # Stage 2
-    self.maxpool = nn.MaxPool2d(kernel_size=2,
+    self.maxpool = nn.MaxPool2d(kernel_size=3,
                                 stride=2)
     
     self.stage2 = ResNetBlock(block, ic_conv=s1_channels,
@@ -44,9 +46,20 @@ class ResNet(nn.Module):
                               oc_conv=s1_channels*32,
                               num_layers=layers[3])
     
-    self.avgpool = nn.AvgPool2d(kernel_size=7, stride=1, padding=0)
+    if self.apool:
+      self.avgpool = nn.AvgPool2d(kernel_size=7, stride=1, padding=0)
     
     self.fc = nn.Linear(2048, nc)
+    
+    #'''
+    for module in self.modules():
+      #if isinstance(module, nn.Conv2d):
+        #nn.init.kaiming_normal_(module.weight, mode='fan_out', nonlinearity='relu')
+        #nn.init.xavier_normal_(module.weight, gain=0.02)
+      if isinstance(module, nn.BatchNorm2d):
+        nn.init.constant_(module.weight.data, 1)
+        #nn.init.constant_(module.bias, 0)
+    #'''
     
   def forward(self, x):
     '''
@@ -55,12 +68,16 @@ class ResNet(nn.Module):
     batch_size = x.size(0)
     
     x = self.conv1(x)
+    #print (x.shape)
     x = self.maxpool(x)
+    #print (x.shape)
     x = self.stage2(x)
+    #print (x.shape)
     x = self.stage3(x)
     x = self.stage4(x)
     x = self.stage5(x)
-    x = self.avgpool(x)    
+    #print (x.shape)
+    x = self.avgpool(x) if self.apool else x
     
     x = x.view(batch_size, -1)
     

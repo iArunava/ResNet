@@ -6,7 +6,7 @@ from .BNConv import BNConv
 class ResidualBlock2L(nn.Module):
   
   def __init__(self, ic_conv, oc_conv, downsample, expansion=4, stride=2,
-                     conv_first=True):
+                     conv_first=True, relu_after_add=True):
     '''
     This class defines the Residual Basic Block with 2 Conv Layers
 
@@ -25,8 +25,10 @@ class ResidualBlock2L(nn.Module):
     super(ResidualBlock2L, self).__init__()
     
     assert(downsample == True or downsample == False)
+    assert(relu_after_add == True or relu_after_add == False)
     self.downsample = downsample
     self.expansion = expansion
+    self.relu_after_add = relu_after_add
     oc_convi = oc_conv // self.expansion
     
     stride = stride if self.downsample else 1
@@ -77,6 +79,6 @@ class ResidualBlock2L(nn.Module):
     xm = self.main(x) if self.downsample else x
     
     x = xm + xs
-    x = self.relu(x)
+    x = self.relu(x) if self.relu_after_add else x
     
     return x
