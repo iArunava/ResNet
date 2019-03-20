@@ -1,16 +1,17 @@
-from .ResNetBlock2L import ResNetBlock2L
-from .ResNetBlock3L import ResNetBlock3L
-from .ResNetBlock import ResNetStage
+from .ResidualBlock import ResidualBlock
+from .ResNetStage import ResNetStage
 
 class ResNet(nn.Module):
   
-  def __init__(self, nc, block, layers, s1_channels=64, apool=True):
+  def __init__(self, nc:int, block:nn.Module, layers:list, lconv:int=2, s1_channels:int=64, apool:bool=True):
     '''
     The class that defines the ResNet module
     
     Arguments:
+    - nc :: # of classes
     - s1_channels : # of channels for the output of the first stage
-
+    - layers
+    - lconv : # of conv layers in each Residual Block
     '''
     super(ResNet, self).__init__()
     
