@@ -3,7 +3,8 @@ from .ResNetStage import ResNetStage
 
 class ResNet(nn.Module):
   
-  def __init__(self, nc:int, block:nn.Module, layers:list, lconv:int=2, s1_channels:int=64, apool:bool=True):
+  def __init__(self, nc:int, block:nn.Module, layers:list, lconv:int=2, expansion:int=1, 
+                     s1_channels:int=64, apool:bool=True, conv_first=True, inplace=False):
     '''
     The class that defines the ResNet module
     
@@ -29,22 +30,29 @@ class ResNet(nn.Module):
               nn.MaxPool2d(kernel_size=3,
                                 stride=2),
     
-              ResNetBlock(block, ic_conv=s1_channels,
-                              oc_conv=s1_channels*4,
+              ResNetBlock(block, inc=s1_channels,
+                              outc=s1_channels*expansion,
                               num_layers=layers[0],
-                              stride=1)
+                              stride=1, conv_first=conv_first,
+                              inplace=inplace),
     
-              ResNetBlock(block, ic_conv=s1_channels*4,
-                              oc_conv=s1_channels*8,
-                              num_layers=layers[1])
+              ResNetBlock(block, inc=s1_channels*expansion,
+                              outc=s1_channels*expansion*2,
+                              num_layers=layers[1], 
+                              conv_first=conv_first,
+                              inplace=inplace),
     
-             ResNetBlock(block, ic_conv=s1_channels*8,
-                              oc_conv=s1_channels*16,
-                              num_layers=layers[2])
+              ResNetBlock(block, inc=s1_channels*expansion*2,
+                              outc=s1_channels*expansion*4,
+                              num_layers=layers[2], 
+                              conv_first=conv_first,
+                              inplace=inplace),
     
-             ResNetBlock(block, ic_conv=s1_channels*16,
-                              oc_conv=s1_channels*32,
-                              num_layers=layers[3])
+              ResNetBlock(block, inc=s1_channels*expansion*4,
+                              outc=s1_channels*expansion*8,
+                              num_layers=layers[3], 
+                              conv_first=conv_first,
+                              inplace=inplace),
             ]
     
     self.net = nn.Sequential(*layers)

@@ -5,17 +5,18 @@ from .ResidualBlock import ResidualBlock
 
 class ResNetBlock(nn.Module):
   
-  def __init__(self, block:nn.Module, ic_conv:int, oc_conv:int, num_layers:int, stride:int=2):
+  def __init__(self, block:nn.Module, inc:int, outc:int, num_layers:int, 
+                     stride:int=2, conv_first=False, inplace=False):
     '''
     '''
     super(ResNetBlock,self).__init__()
     
-    self.rblocks = nn.ModuleList([block(ic_conv=ic_conv,
-                                        oc_conv=oc_conv,
-                                        stride=stride)])
+    self.rblocks = nn.ModuleList([block(inc=inc, outc=outc, stride=stride, 
+                                        conv_first=conv_first, inplace=inplace)])
     
-    self.rblocks.extend([block(ic_conv=oc_conv,
-                                oc_conv=oc_conv) for i in range (num_layers-1)])
+    self.rblocks.extend([block(inc=outc, outc=outc,
+                                conv_first=conv_first, inplace=inplace) 
+                                for i in range (num_layers-1)])
     
   def forward(self, x:torch.Tensor):
     for block in self.rblocks:

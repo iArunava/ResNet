@@ -34,6 +34,7 @@ class BNConv(nn.Module):
         
         act = act.lower()
         norm = norm.lower()
+        normc = out_channels if conv_first else in_channels
         
         if act == 'relu':
             act = nn.ReLU(inplace=inplace)
@@ -43,9 +44,9 @@ class BNConv(nn.Module):
             raise ('Activation value not understood')
 
         if norm == 'batch':
-            norm = nn.BatchNorm2d(out_channels, eps=eps, momentum=momentum)
+            norm = nn.BatchNorm2d(normc, eps=eps, momentum=momentum)
         elif norm == 'instance':
-            norm = nn.InstanceNorm2d(out_channels, eps=eps, momentum=momentum)
+            norm = nn.InstanceNorm2d(normc, eps=eps, momentum=momentum)
         else:
             raise ('Norm value not understood')
         

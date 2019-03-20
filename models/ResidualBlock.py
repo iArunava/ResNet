@@ -6,7 +6,8 @@ from .BNConv import BNConv
 class ResidualBlock(nn.Module):
   
   def __init__(self, inc:int, outc:int, stride:int=1, num_conv:int=2, 
-               expansion:int=4, conv_first:bool=True, relu_after_add:bool=True):
+               expansion:int=4, conv_first:bool=True, relu_after_add:bool=True, 
+               eps:float=1e-5, momentum:float=0.1, inplace=True):
     '''
     This class defines the Residual Basic Block with 2 Conv Layers
 
@@ -39,7 +40,8 @@ class ResidualBlock(nn.Module):
                         stride=stride,
                         eps=eps,
                         momentum=momentum,
-                        conv_first=conv_first)]
+                        conv_first=conv_first,
+                        inplace=inplace)]
     
     for _ in range(num_conv-2):
         layers += [BNConv(in_channels=oc_convi,
@@ -49,7 +51,8 @@ class ResidualBlock(nn.Module):
                             stride=1,
                             eps=eps,
                             momentum=momentum,
-                            conv_first=conv_first)]
+                            conv_first=conv_first,
+                            inplace=inplace)]
     
     layers += [BNConv(in_channels=oc_convi,
                         out_channels=outc,
@@ -58,7 +61,8 @@ class ResidualBlock(nn.Module):
                         stride=1,
                         eps=eps,
                         momentum=momentum,
-                        conv_first=conv_first)]
+                        conv_first=conv_first,
+                        inplace=inplace)]
     
     self.main = nn.Sequential(*layers)
 
@@ -70,7 +74,8 @@ class ResidualBlock(nn.Module):
                             stride=stride,
                             eps=eps,
                             momentum=momentum,
-                            conv_first=conv_first)
+                            conv_first=conv_first,
+                            inplace=inplace)
     
     if self.relu_after_add:
         self.relu = nn.ReLU(inplace=True)
