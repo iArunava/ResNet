@@ -13,17 +13,12 @@ class ResNetBlock(nn.Module):
     
     self.rblocks = nn.ModuleList([block(ic_conv=ic_conv,
                                         oc_conv=oc_conv,
-                                        downsample=True,
                                         stride=stride)])
     
     self.rblocks.extend([block(ic_conv=oc_conv,
-                                oc_conv=oc_conv,
-                                downsample=False) for i in range (num_layers-1)])
+                                oc_conv=oc_conv) for i in range (num_layers-1)])
     
   def forward(self, x):
-    '''
-    '''
     for block in self.rblocks:
         x = block(x)
-
     return x

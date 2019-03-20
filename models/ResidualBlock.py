@@ -5,8 +5,8 @@ from .BNConv import BNConv
 
 class ResidualBlock(nn.Module):
   
-  def __init__(self, inc, outc, downsample, expansion=4, stride=2,
-                     conv_first=True, relu_after_add=True, num_conv=2):
+  def __init__(self, inc, outc, stride=1, num_conv=2, expansion=4,
+                     conv_first=True, relu_after_add=True):
     '''
     This class defines the Residual Basic Block with 2 Conv Layers
 
@@ -24,16 +24,13 @@ class ResidualBlock(nn.Module):
     - num_conv :: # of conv layers in the block for the main branch
     '''
     
-    super(ResidualBlock2L, self).__init__()
+    super(ResidualBlock, self).__init__()
     
-    assert(downsample == True or downsample == False)
     assert(relu_after_add == True or relu_after_add == False)
-    self.downsample = downsample
-    self.expansion = expansion
+
     self.relu_after_add = relu_after_add
-    oc_convi = outc // self.expansion
-    
-    stride = stride if self.downsample else 1
+    self.downsample = True if stride > 1 else False
+    oc_convi = outc // expansion
     
     layers = [BNConv(in_channels=inc,
                         out_channels=oc_convi,
@@ -71,8 +68,8 @@ class ResidualBlock(nn.Module):
                             kernel_size=3,
                             padding=1,
                             stride=stride,
-                            eps=2e-5,
-                            momentum=0.9,
+                            eps=eps,
+                            momentum=momentum,
                             conv_first=conv_first)
     
     if self.relu_after_add:

@@ -16,35 +16,37 @@ class ResNet(nn.Module):
     
     self.apool = apool
     
-    self.conv1 = BNConv(in_channels=3,
-                        out_channels=s1_channels,
-                        kernel_size=7,
-                        padding=3,
-                        stride=2,
-                        eps=2e-5,
-                        momentum=0.9,
-                        conv_first=True)
+    layers = [BNConv(in_channels=3,
+                out_channels=s1_channels,
+                kernel_size=7,
+                padding=3,
+                stride=2,
+                eps=2e-5,
+                momentum=0.9,
+                conv_first=True),
     
-    # Stage 2
-    self.maxpool = nn.MaxPool2d(kernel_size=3,
-                                stride=2)
+              nn.MaxPool2d(kernel_size=3,
+                                stride=2),
     
-    self.stage2 = ResNetBlock(block, ic_conv=s1_channels,
+              ResNetBlock(block, ic_conv=s1_channels,
                               oc_conv=s1_channels*4,
                               num_layers=layers[0],
                               stride=1)
     
-    self.stage3 = ResNetBlock(block, ic_conv=s1_channels*4,
+              ResNetBlock(block, ic_conv=s1_channels*4,
                               oc_conv=s1_channels*8,
                               num_layers=layers[1])
     
-    self.stage4 = ResNetBlock(block, ic_conv=s1_channels*8,
+             ResNetBlock(block, ic_conv=s1_channels*8,
                               oc_conv=s1_channels*16,
                               num_layers=layers[2])
     
-    self.stage5 = ResNetBlock(block, ic_conv=s1_channels*16,
+             ResNetBlock(block, ic_conv=s1_channels*16,
                               oc_conv=s1_channels*32,
                               num_layers=layers[3])
+            ]
+    
+    self.net = nn.Sequential(*layers)
     
     if self.apool:
       self.avgpool = nn.AvgPool2d(kernel_size=7, stride=1, padding=0)
@@ -62,25 +64,10 @@ class ResNet(nn.Module):
     #'''
     
   def forward(self, x):
-    '''
-    '''
     
-    batch_size = x.size(0)
-    
-    x = self.conv1(x)
-    #print (x.shape)
-    x = self.maxpool(x)
-    #print (x.shape)
-    x = self.stage2(x)
-    #print (x.shape)
-    x = self.stage3(x)
-    x = self.stage4(x)
-    x = self.stage5(x)
-    #print (x.shape)
+    bs = x.size(0)
+    x = self.net(x)
     x = self.avgpool(x) if self.apool else x
-    
-    x = x.view(batch_size, -1)
-    
+    x = x.view(bs, -1)
     x = self.fc(x)
-    
     return x
